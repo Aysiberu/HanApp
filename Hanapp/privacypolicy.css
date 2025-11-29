@@ -1,0 +1,63 @@
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #ffffff;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header */
+.header {
+    background-color: #00a68e;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* centers the logo */
+    position: relative; /* allows absolute positioning of back button */
+}
+
+/* Back Button */
+.back-btn {
+    position: absolute;
+    left: 20px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.back-btn:hover {
+    opacity: 0.7;
+}
+
+/* Center Logo */
+.logo img {
+    height: 40px; /* adjust this based on your logo size */
+}
+
+/* Main Container */
+.container {
+    max-width: 850px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+h1 {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+h2 {
+    margin-top: 40px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+p {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
