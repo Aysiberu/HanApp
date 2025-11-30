@@ -67,7 +67,7 @@
           if (!res.ok) throw new Error(body.error || 'Login failed');
           alert('Login successful — redirecting');
           // We don't have a PHP session on Vercel. Redirect to landing page (or change to your PHP host URL where backend runs).
-          window.location.href = '/landingpage.html';
+          window.location.href = 'accountinfo.html';
         } catch (err) {
           msg.style.display = 'block';
           msg.textContent = err.message || 'Login failed';
@@ -76,3 +76,4 @@
     </script>
   </body>
 </html>
+
