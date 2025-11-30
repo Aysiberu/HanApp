@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HanApp | Messages</title>
+    <link rel="stylesheet" href="messages.css" />
+    <style>body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f7f9fb}.header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#fff;border-bottom:1px solid #eee} .nav a{margin-left:12px;color:#333;text-decoration:none}</style>
+  </head>
+  <body>
+    <header class="header">
+      <div>
+        <img src="image/Logo.png" alt="HanApp" height="34" />
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <nav class="nav">
+          <a href="accountinfo.html">Account</a>
+          <a href="bookservice.html">Book Service</a>
+          <a href="bookinghistory.html">Bookings</a>
+          <a href="settings.html">Settings</a>
+          <a href="landingpage.html">Home</a>
+        </nav>
+        <div style="position:relative">
+          <button id="profileBtn" style="padding:6px 8px;border-radius:6px;border:1px solid #ddd;background:#fff">Profile ▾</button>
+          <div id="profileDropdown" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid #ddd;padding:8px;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.08);">
+            <a href="accountinfo.html">Account Info</a><br>
+            <a href="bookinghistory.html">Booking History</a><br>
+            <a href="messages.html">Messages</a><br>
+            <a href="settings.html">Settings</a><br>
+            <a href="logout.html">Log Out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main style="padding:20px;max-width:960px;margin:0 auto">
+      <h1>Messages</h1>
+
+      <div id="choose" style="margin-bottom:18px">
+        <label>Current user id: <input id="userId" type="number" style="width:80px" /> </label>
+        <label style="margin-left:12px">Other user id: <input id="otherId" type="number" style="width:80px" /></label>
+        <button id="openConv" style="margin-left:12px">Open conversation</button>
+        <small style="display:block;margin-top:6px;color:#666">Tip: put ?u=1&to=2 in the URL to open a conversation directly.</small>
+      </div>
+
+      <div id="chatRoot" style="display:none">
+        <div id="messagesBox" style="height:320px;overflow:auto;border:1px solid #ddd;padding:12px;background:#fff;border-radius:6px"></div>
+        <form id="sendForm" style="display:flex;margin-top:10px">
+          <input id="msgInput" placeholder="Write a message" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px" />
+          <button type="submit" style="margin-left:8px;padding:8px 12px">Send</button>
+        </form>
+      </div>
+
+      <div id="status" style="margin-top:10px;color:#a00"></div>
+    </main>
+
+    <script>
+      const pbtn = document.getElementById('profileBtn'); const pdd = document.getElementById('profileDropdown'); if(pbtn){ pbtn.addEventListener('click', ()=>{ pdd.style.display = pdd.style.display === 'block' ? 'none' : 'block'; }); window.addEventListener('click', (e)=>{ if(!pbtn.contains(e.target) && !pdd.contains(e.target)) pdd.style.display='none'; }); }
+      const q = new URLSearchParams(location.search);
+      const defaultU = q.get('u');
+      const defaultTo = q.get('to') || q.get('other');
+      const userEl = document.getElementById('userId');
+      const otherEl = document.getElementById('otherId');
+      const openBtn = document.getElementById('openConv');
+      const chatRoot = document.getElementById('chatRoot');
+      const messagesBox = document.getElementById('messagesBox');
+      const sendForm = document.getElementById('sendForm');
+      const msgInput = document.getElementById('msgInput');
+      const status = document.getElementById('status');
+
+      if (defaultU) userEl.value = defaultU;
+      if (defaultTo) otherEl.value = defaultTo;
+
+      function showError(e) { status.textContent = e; }
+
+      let polling = null;
+
+      async function loadMessages(user, other) {
+        messagesBox.innerHTML = '<p style="color:#888">Loading…</p>';
+        try {
+          const res = await fetch(`/api/fetch_messages?u=${user}&other=${other}`);
+          if (!res.ok) throw new Error('Could not fetch messages');
+          const data = await res.json();
+          messagesBox.innerHTML = '';
+          data.forEach(m => {
+            const el = document.createElement('div');
+            el.style.padding = '6px';
+            el.style.marginBottom = '6px';
+            el.style.borderRadius = '6px';
+            if (m.sender_id == user) { el.style.background = '#def7e2'; el.style.textAlign = 'right'; }
+            else { el.style.background = '#fff'; el.style.textAlign = 'left'; }
+            el.textContent = (m.message || '').trim() + '  — ' + new Date(m.created_at).toLocaleString();
+            messagesBox.appendChild(el);
+          });
+          messagesBox.scrollTop = messagesBox.scrollHeight;
+        } catch (err) {
+          console.error(err); showError(err.message||'Error');
+        }
+      }
+
+      openBtn.addEventListener('click', () => {
+        status.textContent = '';
+        const user = parseInt(userEl.value,10);
+        const other = parseInt(otherEl.value,10);
+        if (!user || !other) { showError('Enter both ids'); return; }
+        chatRoot.style.display = 'block';
+        loadMessages(user, other);
+        if (polling) clearInterval(polling);
+        polling = setInterval(()=>loadMessages(user, other), 2500);
+
+        sendForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const text = msgInput.value.trim(); if (!text) return;
+          try {
+            const resp = await fetch('/api/send_message', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ sender_id:user, receiver_id:other, message:text }) });
+            if (!resp.ok) throw new Error((await resp.json()).error || 'Send failed');
+            msgInput.value = '';
+            loadMessages(user, other);
+          } catch (err) { showError(err.message || 'Send error'); }
+        };
+      });
+
+      // if URL contains u= & to= open automatically
+      if (defaultU && defaultTo) openBtn.click();
+    </script>
+  </body>
+</html>

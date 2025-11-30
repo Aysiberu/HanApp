@@ -1,0 +1,30 @@
+/* settings.css - imported by settings.php */
+.toggle-row { display:flex; align-items:center; gap:12px; margin-top:10px; }
+.switch {
+  position:relative; display:inline-block; width:46px; height:26px;
+}
+.switch input { display:none; }
+.slider {
+  position:absolute; cursor:pointer; inset:0;
+  background:#ccc; border-radius:999px; transition: .18s;
+}
+.slider:before {
+  content:""; position:absolute; width:18px; height:18px; left:4px; top:4px;
+  background:#fff; border-radius:50%; transition:.18s; box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+.switch input:checked + .slider { background: #00a68e; }
+.switch input:checked + .slider:before { transform: translateX(20px); }
+
+/* small buttons */
+.btn { display:inline-block; background:var(--accent); color:#fff; padding:10px 14px; border-radius:8px; text-decoration:none; }
+.btn.small{ padding:6px 10px; font-size:13px; }
+.small.red{ background:#ffecec; color:#b30000; border:0; padding:6px 8px; border-radius:6px; cursor:pointer; }
+
+/* verification method layout */
+.verify-grid{ display:flex; gap:18px; margin-top:12px; }
+.verify-box{ background:#f8fafb; padding:12px; border-radius:8px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); min-width:280px; }
+
+/* responsive */
+@media (max-width:980px){
+  .verify-grid{ flex-direction:column; }
+}
