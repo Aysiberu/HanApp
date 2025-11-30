@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Provider — Extra information</title>
+    <link rel="stylesheet" href="app.css" />
+    <style>body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:20px;background:var(--bg)} .card{max-width:900px;margin:18px auto;padding:18px;background:var(--card);border-radius:6px;border:1px solid #eee}</style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Provider extra details</h1>
+      <p>Tell customers more about your services. Upload certificates (optional) and proceed to add a profile picture next.</p>
+
+      <form id="extraForm">
+        <input type="hidden" id="providerId" />
+        <input type="hidden" id="userId" />
+        <div>
+          <div style="display:flex;gap:12px;margin-bottom:12px">
+            <div style="flex:1">
+              <label>House / Unit No.</label>
+              <input id="houseNumberProvider" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd" placeholder="e.g. 12A" />
+            </div>
+            <div style="flex:2">
+              <label>Street / Barangay</label>
+              <input id="streetProvider" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd" placeholder="Street name, barangay" />
+            </div>
+          </div>
+          <label>Service types (select multiple):</label><br>
+          <select id="serviceTypes" multiple size="6" style="width:100%;max-width:420px">
+            <option>Assembly</option>
+            <option>Mounting</option>
+            <option>Pest Control</option>
+            <option>Plumbing</option>
+            <option>Painting</option>
+            <option>Cleaning</option>
+            <option>Moving</option>
+            <option>Electrical Help</option>
+          </select>
+        </div>
+
+        <div style="margin-top:12px">
+          <label>Company (optional) <input id="company" style="width:320px" /></label>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+          <label>Availability (human friendly) <input id="availability" style="width:360px" /></label>
+          <label>From <input id="availFrom" type="time" /></label>
+          <label>To <input id="availTo" type="time" /></label>
+        </div>
+
+        <div style="margin-top:12px">
+          <label>Certificate (optional) <input id="certFile" type="file" accept="image/*" /></label>
+          <div id="certPreview" style="margin-top:8px"></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <button type="submit">Save details & upload certificate</button>
+          <button id="skipAvatar" type="button">Skip and add profile photo later</button>
+        </div>
+
+        <div id="msg" style="color:#a00;margin-top:8px;display:none"></div>
+      </form>
+    </div>
+
+    <script>
+      // read query params
+      const q = new URLSearchParams(location.search);
+      const pid = q.get('providerId'); const uid = q.get('userId');
+      document.getElementById('providerId').value = pid || '';
+      document.getElementById('userId').value = uid || '';
+
+      // file preview and upload as base64
+      document.getElementById('certFile').addEventListener('change', async function(e){
+        const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = ()=>{ document.getElementById('certPreview').innerHTML = `<img src="${r.result}" style="max-width:320px;max-height:160px;object-fit:cover;border:1px solid #ccc;border-radius:4px"/>`; }; r.readAsDataURL(f);
+      });
+
+      document.getElementById('extraForm').addEventListener('submit', async function(e){
+        e.preventDefault(); const msg=document.getElementById('msg'); msg.style.display='none';
+        const providerId=document.getElementById('providerId').value; const userId=document.getElementById('userId').value;
+        const st = Array.from(document.getElementById('serviceTypes').selectedOptions).map(o=>o.value).join(',');
+        const company=document.getElementById('company').value.trim(); const availability=document.getElementById('availability').value.trim();
+        const availability_from=document.getElementById('availFrom').value || null; const availability_to=document.getElementById('availTo').value || null;
+
+        // upload certificate if any
+        const certInput = document.getElementById('certFile');
+        let certificate_url = null;
+        if (certInput.files && certInput.files[0]) {
+          const f = certInput.files[0]; const reader = new FileReader();
+          reader.onload = async ()=>{
+            try{
+              const base = reader.result;
+              const fn = f.name.replace(/[^a-z0-9.\-]/gi,'_');
+              const up = await fetch('/api/upload_image', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ filename: fn, base64: base, path: `providers/${userId}`, contentType: f.type }) });
+              const j = await up.json(); if (!up.ok) throw new Error(j.error || 'Upload failed');
+              certificate_url = j.url;
+              // then save provider record
+              await saveProvider(providerId, userId, st, company, availability, availability_from, availability_to, certificate_url);
+            }catch(err){ msg.style.display='block'; msg.textContent = err.message || 'Error uploading'; }
+          };
+          reader.readAsDataURL(f);
+        } else {
+          await saveProvider(providerId, userId, st, company, availability, availability_from, availability_to, null);
+        }
+      });
+
+      document.getElementById('skipAvatar').addEventListener('click', function(){ const pid=document.getElementById('providerId').value||''; const uid=document.getElementById('userId').value||''; window.location.href = `/provider_avatar.html?providerId=${encodeURIComponent(pid)}&userId=${encodeURIComponent(uid)}`; });
+
+      async function saveProvider(providerId, userId, service_types, company, availability, availability_from, availability_to, certificate_url){
+        const msg=document.getElementById('msg'); try{
+          const res = await fetch('/api/provider_update', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ providerId: providerId || null, userId: userId || null, service_types, company, availability, availability_from, availability_to, certificate_url, houseNumber: document.getElementById('houseNumberProvider').value.trim(), street: document.getElementById('streetProvider').value.trim() }) });
+          const body = await res.json(); if(!res.ok) throw new Error(body.error || 'Could not save');
+          // continue to avatar upload
+          const pid = providerId || body.provider?.id || '';
+          window.location.href = `/provider_avatar.html?providerId=${encodeURIComponent(pid)}&userId=${encodeURIComponent(userId)}`;
+        } catch(err){ msg.style.display='block'; msg.textContent = err.message || 'Could not save provider'; }
+      }
+    </script>
+  </body>
+</html>

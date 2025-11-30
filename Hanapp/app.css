@@ -1,0 +1,69 @@
+/* Global app stylesheet (based on signuppage.css layout + variables)
+   This file centralizes common layout, colors and base components used across the app.
+*/
+:root {
+    --bg: #f5f7f8;
+    --card: #fff;
+    --accent: #00a68e;
+    --muted: #666;
+    --shadow: 0 8px 22px rgba(0,0,0,0.06);
+    --radius: 10px;
+    --max-card: 920px;
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+* { box-sizing: border-box; margin:0; padding:0 }
+html,body { height:100%; }
+body {
+    background: var(--bg);
+    color: #212121;
+    display:flex;
+    flex-direction:column;
+    min-height: 100vh;
+}
+
+header{
+    background: var(--card);
+    padding: 12px 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+header img{ height:50px }
+
+.container { flex:1; display:flex; justify-content:center; align-items:center; padding:32px; }
+.card{
+    width:100%; max-width: var(--max-card); background:var(--card); padding:28px; border-radius:12px; box-shadow: var(--shadow);
+}
+
+.brand{ display:flex; align-items:center; gap:12px; justify-content:center; margin-bottom:6px }
+.heading{ text-align:center; font-weight:700; margin-bottom:10px; color:#111 }
+.divider{ height:1px; background: linear-gradient(90deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02)); margin:12px 0; border-radius:2px }
+
+form { display:grid; gap:16px }
+.row-4{ display:grid; grid-template-columns: 1fr 120px 1fr 100px; gap:12px; align-items:end }
+.row-2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px }
+
+label{ display:block; font-size:0.85rem; color:var(--muted); margin-bottom:6px }
+input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select { width:100%; padding:9px 10px; border-radius:8px; border:1px solid #ddd; font-size:0.95rem; background: #fff }
+input:focus, select:focus{ outline:none; border-color: var(--accent); box-shadow: 0 8px 24px rgba(0,166,142,0.06); }
+
+.mi { max-width:120px }
+.ext { max-width:100px }
+
+.actions{ display:flex; justify-content:center }
+.btn{ background:var(--accent); color:#fff; padding:12px 36px; border-radius:8px; border:0; font-weight:700; cursor:pointer }
+.btn:hover{ background:#008f79 }
+
+.small-note{ text-align:center; color:var(--muted); margin-top:6px }
+
+footer{ background:#006d68;color:#fff;padding:14px;text-align:center }
+
+@media (max-width:900px){
+  .row-4 { grid-template-columns: 1fr 100px 1fr 80px }
+}
+@media (max-width:600px){
+  .row-4, .row-2{ grid-template-columns: 1fr }
+  .mi, .ext { max-width:none }
+}
