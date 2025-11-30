@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HanApp | Book Service</title>
+  <link rel="stylesheet" href="bookservice.css" />
+</head>
+<body>
+  <header style="padding:12px 20px;background:#fff;border-bottom:1px solid #eee">
+    <img src="image/Logo.png" height="34" alt="HanApp" />
+    <nav style="float:right"><a href="accountinfo.html">Account</a> | <a href="bookinghistory.html">Bookings</a> | <a href="messages.html">Messages</a></nav>
+  </header>
+    <header style="padding:12px 20px;background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between">
+      <img src="image/Logo.png" height="34" alt="HanApp" />
+      <div style="display:flex;align-items:center;gap:12px">
+        <nav><a href="accountinfo.html">Account</a> | <a href="bookinghistory.html">Bookings</a> | <a href="messages.html">Messages</a></nav>
+        <div style="position:relative">
+          <button id="profileBtn" style="padding:6px 8px;border-radius:6px;border:1px solid #ddd;background:#fff">Profile ▾</button>
+          <div id="profileDropdown" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid #ddd;padding:8px;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.08);">
+            <a href="accountinfo.html">Account Info</a><br>
+            <a href="bookinghistory.html">Booking History</a><br>
+            <a href="messages.html">Messages</a><br>
+            <a href="settings.html">Settings</a><br>
+            <a href="logout.html">Log Out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+  <main style="max-width:960px;margin:20px auto">
+    <h1>Book a Service</h1>
+    <p>Select a service and continue. This is a static client page — booking persistence requires a backend.</p>
+
+    <form id="serviceForm" action="bookservice_step2.html" method="GET">
+      <label>Select service type:
+        <select name="service" id="service">
+          <option value="Plumbing">Plumbing</option>
+          <option value="Cleaning">Cleaning</option>
+          <option value="Moving">Moving</option>
+        </select>
+      </label>
+      <button type="submit" style="margin-left:12px">Continue</button>
+    </form>
+  </main>
+
+  <footer style="padding:20px;text-align:center;color:#888">© 2025 HanApp</footer>
+
+    <script>
+      const pbtn = document.getElementById('profileBtn'); const pdd = document.getElementById('profileDropdown'); if(pbtn){ pbtn.addEventListener('click', ()=>{ pdd.style.display = pdd.style.display === 'block' ? 'none' : 'block'; }); window.addEventListener('click', (e)=>{ if(!pbtn.contains(e.target) && !pdd.contains(e.target)) pdd.style.display='none'; }); }
+    </script>
+</body>
+</html>
