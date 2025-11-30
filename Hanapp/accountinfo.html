@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HanApp | Account</title>
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="accountinfo.css" />
+  </head>
+  <body>
+    <header style="padding:12px 20px;background:#fff;border-bottom:1px solid #eee">
+      <img src="image/Logo.png" alt="HanApp" height="34" />
+      <div style="float:right;display:flex;align-items:center;gap:12px">
+        <nav>
+          <a href="bookservice.html">Book Service</a> | <a href="messages.html">Messages</a> | <a href="settings.html">Settings</a>
+        </nav>
+        <div style="position:relative">
+          <button id="profileBtn" style="padding:6px 8px;border-radius:6px;border:1px solid #ddd;background:#fff">Profile ▾</button>
+          <div id="profileDropdown" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid #ddd;padding:8px;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.08);">
+            <a href="accountinfo.html">Account Info</a><br>
+            <a href="bookinghistory.html">Booking History</a><br>
+            <a href="messages.html">Messages</a><br>
+            <a href="settings.html">Settings</a><br>
+            <a href="logout.html">Log Out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="card main">
+        <h2 class="heading">Your Account</h2>
+        <div class="divider"></div>
+        <p>This is a static version of the account page for Vercel. Your original PHP server would show personalized user data here.</p>
+        <p style="margin-top:8px;color:var(--muted)"><b>Note:</b> To connect this page to real user data, host the PHP backend or convert this page to use serverless APIs and session auth.</p>
+      </div>
+    </div>
+
+    <script>
+      const btn = document.getElementById('profileBtn'); const dd = document.getElementById('profileDropdown'); if(btn){ btn.addEventListener('click', ()=>{ dd.style.display = dd.style.display === 'block' ? 'none' : 'block'; }); window.addEventListener('click', (e)=>{ if(!btn.contains(e.target) && !dd.contains(e.target)) dd.style.display='none'; }); }
+    </script>
+    <footer style="padding:20px;text-align:center;color:#888">© 2025 HanApp</footer>
+  </body>
+</html>

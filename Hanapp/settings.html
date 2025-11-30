@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HanApp | Settings</title>
+    <link rel="stylesheet" href="app.css" />
+</head>
+
+<body style="font-family:Arial,Helvetica,sans-serif">
+        <header style="padding:12px 20px;background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between">
+            <img src="image/Logo.png" height="34" alt="HanApp" />
+            <div style="display:flex;align-items:center;gap:12px">
+                <nav><a href="accountinfo.html">Account</a> | <a href="bookservice.html">Book Service</a> | <a href="messages.html">Messages</a></nav>
+                <div style="position:relative">
+                    <button id="profileBtn" style="padding:6px 8px;border-radius:6px;border:1px solid #ddd;background:#fff">Profile ▾</button>
+                    <div id="profileDropdown" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid #ddd;padding:8px;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.08);">
+                        <a href="accountinfo.html">Account Info</a><br>
+                        <a href="bookinghistory.html">Booking History</a><br>
+                        <a href="messages.html">Messages</a><br>
+                        <a href="logout.html">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="container">
+            <div class="card main" style="max-width:900px;margin:0 auto">
+        <h1>Settings</h1>
+        <p>This is the static settings page — server-side profile updates are handled by your backend.</p>
+        <section style="margin-top:16px;padding:12px;border-radius:6px;border:1px solid #ddd;background:#fff">
+            <h3>Change password</h3>
+            <form id="pwdForm">
+                <label>Email <input id="pwdEmail" required></label><br>
+                <label>Current password <input id="pwdCurrent" type="password" required></label><br>
+                <label>New password <input id="pwdNew" type="password" required></label><br>
+                <button type="submit">Change password</button>
+            </form>
+            <div id="pwdMsg" style="color:#a00;margin-top:8px;display:none"></div>
+        </section>
+                <p><a href="accountinfo.html">Back to account</a></p>
+            </div>
+        </div>
+    <script>
+        document.getElementById('pwdForm').addEventListener('submit', async function(e){
+            e.preventDefault(); const msg=document.getElementById('pwdMsg'); msg.style.display='none';
+            const email=document.getElementById('pwdEmail').value.trim(); const cur=document.getElementById('pwdCurrent').value; const nw=document.getElementById('pwdNew').value;
+            try{ const res=await fetch('/api/update_password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,currentPassword:cur,newPassword:nw})}); const body=await res.json(); if(!res.ok) throw new Error(body.error||'Failed'); alert('Password updated'); }catch(err){ msg.style.display='block'; msg.textContent=err.message; }
+        });
+        const pbtn = document.getElementById('profileBtn'); const pdd = document.getElementById('profileDropdown'); if(pbtn){ pbtn.addEventListener('click', ()=>{ pdd.style.display = pdd.style.display === 'block' ? 'none' : 'block'; }); window.addEventListener('click', (e)=>{ if(!pbtn.contains(e.target) && !pdd.contains(e.target)) pdd.style.display='none'; }); }
+    </script>
+    <footer style="padding:20px;text-align:center;color:#888">© 2025 HanApp</footer>
+</body>
+
+</html>
